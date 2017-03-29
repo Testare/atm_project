@@ -1,0 +1,30 @@
+* gamma String 
+* init String
+* states [String]
+* g String {Accept|Reject|And|Or} 
+* delta String Symbol String Symbol {L|R}
+* Anything else is ignored
+
+* Sets the tape alphabet
+gamma 01
+
+* Find the middle of the input
+states q0 q1 q2 q3 fail
+
+g q0 Or
+g q1 And
+g q2 And
+g q3 Accept
+g fail Reject
+
+delta q0 1 q1 1 R
+delta q0 0 q2 0 R
+delta q0 _ fail _ L
+
+delta q1 1 q1 1 R
+delta q1 0 q3 0 L
+delta q1 _ fail _ L
+
+delta q2 0 q2 0 R
+delta q2 1 q3 1 L
+delta q2 _ fail _ L

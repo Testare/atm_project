@@ -1,0 +1,126 @@
+#+TITLE:     Alternation Turing Machines
+#+AUTHOR:    Logan Woodbury
+#+EMAIL:     Testare.i9z@gmail.com
+#+DATE:      [2017-03-21 Wed]
+#+DESCRIPTION: A presentation on Alternating Turing Machines
+#+LANGUAGE:  en
+
+** Outline
+*** Nondeterministic Turing Machines
+*** Alternation
+*** ATIME and ASPACE
+*** \(\Sigma\)_{i}-alternating Turing Machines and \(\Pi\)_{i}-alternating Turing Machines
+
+* Nondeterministic Turing Machines
+** Basic Idea
+*** Deterministic Finite Automata \rightarrow Nondeterministic Finite Automata
+** Basic Idea
+*** Deterministic Finite Automata \rightarrow Nondeterministic Finite Automata
+*** Turing Machine \rightarrow ?
+** Basic Idea
+*** Deterministic Finite Automata \rightarrow Nondeterministic Finite Automata
+*** Turing Machine \rightarrow Nondeterministic Turing Machine
+** Basic Idea
+*** Deterministic Finite Automata \rightarrow Nondeterministic Finite Automata
+*** Turing Machine \rightarrow Nondeterministic Turing Machine
+*** P \rightarrow NP
+** Formal Description
+*** \(M = (Q,\Sigma,\iota,\_,A,\delta) \)
+**** $Q$ is the set of states
+**** $\Sigma$ is the Tape Alphabet
+**** $\iota$ is the initial state: $\iota \in Q$
+**** $\_$ is the blank symbol: $\_ \in \Sigma$
+**** $A$ is the set of accept states: $A \in Q$
+**** $\delta$ is the transition function: $\delta \subset (Q \backslash A x \Sigma) \rightarrow P(Q x \Sigma x \{L,R\})$
+
+** Example: SAT
+*** Assign all possible assignments of variables concurrently
+*** Check if any of them evaluate to true... concurrently!
+*** If you find one that does, accept!
+* Alternation
+** Basic Idea
+*** NTMs are kinda... easy to please?
+** Basic Idea
+*** NTMs are kinda... easy to please?
+*** All states are logical "or's"
+** Basic Idea
+*** How about we have a system where we could have alternating or's and and's?
+** Basic Idea
+  [[./atm_tree.png]]
+** Basic Idea
+*** Turing Machines \rightarrow Nondeterministic Turing Machines \rightarrow Alternating Turing Machines
+*** P \rightarrow NP \rightarrow AP
+** Formal Description
+*** \(M = (Q,\Gamma,\delta,q_{0},g)\)
+**** $Q$ is the still set of states
+**** $\Gamma$ is now the Tape Alphabet
+**** $\delta$ is still the transition function: $\delta : (Q x \Sigma) \rightarrow P(Q x \Gamma x \{L,R\})$
+**** $q_{0}$ is now the initial state: $q_{0} \in Q$
+**** $g$ is a function that specifies the /type/ of each state $g : Q \rightarrow \{\land,\lor,accept,reject\}$
+** Examples: TAUT (Tautology)
+*** $TAUT = \{\langle \Phi \rangle | \Phi$ is a tautology$\}$ **** Universally select all possible assignments to the variables of $\Phi$ ($\land$) **** Evaluate these assignments to see if they are true **** If all the assignments accept, accept! Otherwise... reject! 
+** Examples: SEXY
+*** L = \{S | S is a series of 1's in a positive multiple of 3, followed by an even amount of 0's, or the inverse (3x 0's followed by 2y 1's)\}
+*** Spent a lot of time on this one! 
+*** Not exactly a particularly difficult problem to solve anyhow, but...
+
+** Examples: MIN-FORMULA
+*** $MIN-FORMULA = \{\langle \Phi \rangle | \Phi$ is the smallest possible way to express that formula$\}$
+**** /Universally/ select all formulas $\psi$ that are shorter than $\Phi$ ($\land$)
+**** /Existentially/ select an assignment to the variables of $\Phi$ ($\lor$)
+**** Evaluate both $\Phi$ and $\psi$, accept if they have the same values, otherwise reject!
+
+* ATIME and ASPACE
+** TIME and (Relative Dimension In) SPACE
+   [[./tardis.jpg]]
+** ATIME and ASPACE (ATARDIAS?)
+*** $ATIME(t(n)) = \{L|L$ is decided by an $O(t(n))$ time alternating Turing Machine $\}$
+*** $ASPACE(f(n)) = \{L|L$ is decided by an $O(f(n))$ space alternating Turing Machine $\}$
+** Relations!
+*** For $f(n) \ge n$, we have $ATIME(f(n)) \subseteq SPACE(f(n)) \subseteq ATIME(f^{2}(n))$
+*** For $f(n) \ge \log n$, we have $ASPACE(f(n)) = TIME(2^{O(f(n))})$
+* \(\Sigma\)_{i}-alternating Turing Machines and \(\Pi\)_{i}-alternating Turing Machines
+** Definitions
+*** $\Sigma_{i}$-alternating Turing machine is an alternating Turing machine that on the longest possible branch has $i runs$ universal or existential steps
+*** $\Sigma_{i}$-alternating Turing machines start with existential steps
+*** $\Pi_{i}$-alternating Turing machines start with universal steps
+** \(\Sigma\)_{i}TIME, \(\Pi\)_{i}TIME, \(\Sigma\)_{i}SPACE, \(\Pi\)_{i}SPACE
+*** ...Not hard to figure out what all these are
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+*** $\Sigma_{1}P$
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+*** $NP = \Sigma_{1}P$
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+*** $NP = \Sigma_{1}P$
+*** $coNP = \Pi_{1}P$
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+*** $NP = \Sigma_{1}P$
+*** $coNP = \Pi_{1}P$
+*** $MIN-FORMULA \in \Pi_{2}P$
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+*** $NP = \Sigma_{1}P$
+*** $coNP = \Pi_{1}P$
+*** $MIN-FORMULA \in \Pi_{2}P$
+*** $SEXY \in \Sigma_{3}P$
+** \(\Sigma_{i}P\) and \(\Pi _{i}P\)
+*** $\Sigma_{i}P = \cup_{k \in \Re} \Sigma_{i}TIME(n^{k})$
+*** $\Pi_{i}P = \cup_{k \in \Re} \Pi_{i}TIME(n^{k})$
+*** $NP = \Sigma_{1}P$
+*** $coNP = \Pi_{1}P$
+*** $MIN-FORMULA \in \Pi_{2}P$
+*** $SEXY \in \Sigma_{3}P$
+*** (It is also most definitely in P)
+* Conclusion

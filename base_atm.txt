@@ -1,0 +1,23 @@
+* gamma String 
+* init String
+* states [String]
+* g String {Accept|Reject|And|Or} 
+* delta String Symbol String Symbol {L|R}
+* Anything else is ignored, including incomplete commands such as:
+delta q1 _ 
+***************
+
+states q0 q1 q2 q3 q4
+gamma 01
+
+g q0 Or
+g q1 And
+g q2 Accept
+g q3 Reject
+g q4 Reject
+
+delta q0 _ q1 0 L
+delta q0 _ q4 1 R
+delta q1 _ q2 1 L
+delta q1 _ q2 0 R
+* Yada yada yadda

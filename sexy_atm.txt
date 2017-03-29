@@ -1,0 +1,96 @@
+* gamma String 
+* init String
+* states [String]
+* g String {Accept|Reject|And|Or} 
+* delta String Symbol String Symbol {L|R}
+* Anything else is ignored
+
+
+* Sets the tape alphabet
+gamma 01-
+
+* Find the middle of the input, set up or - and
+states q0 q1 q2 q3 q4 fail good 
+
+g q0 Or
+g q1 Or
+g q2 Or
+g q3 And
+g q4 And
+g fail Reject
+g good Accept
+
+
+delta q0 1 q1 1 R
+delta q0 0 q2 0 R
+delta q0 _ fail _ L
+
+delta q1 1 q1 1 R
+delta q1 0 q3 0 L
+delta q1 0 q4 0 L
+delta q1 _ fail _ L
+
+delta q2 0 q2 0 R
+delta q2 1 q3 1 L
+delta q2 1 q4 1 L
+delta q2 _ fail _ L
+
+
+* Finds either a multiple of 3 0's followed by a multiple of 2 1's...
+
+states three10 three11 three12 two00 two01
+
+g three00 Or
+g three01 Or
+g three02 Or
+g two10 Or
+g two11 Or
+
+
+delta q3 0 three01 - L
+delta q3 1 fail - L
+delta q3 0 two10 0 R
+
+delta three00 0 three01 - L
+delta three00 _ good - L
+delta three01 0 three02 - L
+delta three01 _ fail - L
+delta three02 0 three00 - L
+delta three02 _ fail - L
+
+delta two10 1 two11 - R
+delta two10 _ good - R
+delta two11 1 two10 - R
+delta two11 _ fail - R
+delta two10 0 fail 0 L
+delta two11 0 fail 0 L
+
+* ...Or a multiple of 3 1's followed by a multiple of 2 0's
+
+states three00 three01 three02 two10 two11
+
+g three10 Or
+g three11 Or
+g three12 Or
+g two00 Or
+g two01 Or
+
+delta q4 1 three11 - L
+delta q4 0 fail - L
+delta q4 1 two00 0 R
+
+delta three10 1 three11 - L
+delta three10 _ good - L
+delta three11 1 three12 - L
+delta three11 _ fail - L
+delta three12 1 three10 - L
+delta three12 _ fail - L
+
+delta two00 0 two01 - R
+delta two00 _ good - R
+delta two00 1 fail 1 L
+delta two01 0 two00 - R
+delta two01 _ fail - R
+delta two01 1 fail 1 L
+
+init q0
