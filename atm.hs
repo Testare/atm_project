@@ -13,7 +13,7 @@ data Tape = Tape {len :: Int, tape_arr :: [Symbol]} deriving (Eq)
 data Configuration = Configuration {config_state :: State, pos :: Int, tape :: Tape} deriving (Eq)
 
 --A configuration Node, defined as a Configuration with potential configuration node children, each representing a sequential configuration from the current one
-data ConfigNode = ConfigNode {configuration :: Configuration, children :: [ConfigNode]} deriving (Eq)
+data ConfigNode = ConfigNode {configuration :: Configuration, children :: Maybe [ConfigNode]} deriving (Eq)
 
 --The acceptance state of a given configuration... I should probably refactor it to a better name
 data ConfigType = Error | Rejecting | Deciding | Accepting deriving (Show, Eq, Ord, Bounded)
@@ -64,11 +64,11 @@ instance Show ConfigNode where
   show config_node = show_depth 0 config_node
     where show_depth :: Int -> ConfigNode -> [Char]
           show_depth depth (ConfigNode config children') = ((replicate depth '|') ++ '*':(show config)
-                                                           ++ '\n':(concat $ map (show_depth (succ depth)) children'))
+                                                           ++ '\n':(concat $ map (show_depth (succ depth)) (fromMaybe [] children')))
 
 --Gets a starting configuration node for an ATM given an input tape
 start_config_input :: ATM -> Tape -> ConfigNode
-start_config_input atm tape' = (ConfigNode (Configuration (q0 atm) 0 tape') [])
+start_config_input atm tape' = (ConfigNode (Configuration (q0 atm) 0 tape') Nothing)
 
 --Gets a default starting configuration for an ATM with a blank tape
 start_config :: ATM -> ConfigNode
@@ -116,22 +116,24 @@ apply_transition config trans = Configuration state (new_pos pos' leftright) (ch
 --Gets a list of ConfigNode children based on a transition function and a specific configuration
 next_states ::TransitionFunction -> Configuration -> [ConfigNode]
 next_states transFunc config =
-  [(ConfigNode (apply_transition config trans) []) | trans <- get_transitions config transFunc]
+  [(ConfigNode (apply_transition config trans) Nothing) | trans <- get_transitions config transFunc]
 
 --Runs the next step of this node
 step_node :: ATM -> ConfigNode -> ConfigNode
-step_node atm (ConfigNode config []) = (ConfigNode config (next_states (delta atm) config))
-step_node atm (ConfigNode config children') = (ConfigNode config [(step_node atm child) | child <- children'])
+step_node atm (ConfigNode config (Just [])) = (ConfigNode config (Just []))
+step_node atm (ConfigNode config Nothing) = (ConfigNode config $ Just (next_states (delta atm) config))
+step_node atm (ConfigNode config (Just children')) = (ConfigNode config $ Just [(step_node atm child) | child <- children'])
 
 --Determines the acceptance state (ConfigType) of the ConfigNode
 get_config_type :: ATM -> ConfigNode -> ConfigType
 get_config_type atm node
   | node_state_type == Accept = Accepting
   | node_state_type == Reject = Rejecting
-  | node_state_type == Or && children' == [] = Deciding
-  | node_state_type == Or = foldl max Rejecting (map (get_config_type atm) children')
-  | node_state_type == And && children' == [] = Deciding
-  | node_state_type == And = foldl min Accepting (map (get_config_type atm) children')
+  | children' == (Just []) = Rejecting --Dead end nodes should reject
+  | node_state_type == Or && children' == Nothing = Deciding
+  | node_state_type == Or = let (Just children'') = children' in foldl max Rejecting (map (get_config_type atm) children'')
+  | node_state_type == And && children' == Nothing = Deciding
+  | node_state_type == And = let (Just children'') = children' in foldl min Accepting (map (get_config_type atm) children'')
   | otherwise = Error
   where (ConfigNode config children') = node
         Just node_state_type = M.lookup (config_state config) (g atm)
@@ -170,7 +172,7 @@ accept_tree :: ATM -> ConfigNode -> String
 accept_tree atm config_node = show_depth 0 config_node
     where show_depth :: Int -> ConfigNode -> [Char]
           show_depth depth configNode = ((replicate depth '|') ++ '-':(show node_state_type) ++ ':':(show (get_config_type atm configNode))
-                                                           ++ '\n':(concat $ map (show_depth (succ depth)) (children configNode)))
+                                                           ++ '\n':(concat $ map (show_depth (succ depth)) $ fromMaybe [] (children configNode)))
             where Just node_state_type = M.lookup (config_state $ configuration configNode) (g atm)
 
 --Displays the typically display of a ConfigNode /with/ the acceptance state information
