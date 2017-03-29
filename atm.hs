@@ -63,7 +63,7 @@ instance Show Configuration where
 instance Show ConfigNode where
   show config_node = show_depth 0 config_node
     where show_depth :: Int -> ConfigNode -> [Char]
-          show_depth depth (ConfigNode config children') = ((replicate (pred depth) '|') ++ '*':(show config)
+          show_depth depth (ConfigNode config children') = ((replicate depth '|') ++ '*':(show config)
                                                            ++ '\n':(concat $ map (show_depth (succ depth)) children'))
 
 --Gets a starting configuration node for an ATM given an input tape
@@ -169,7 +169,7 @@ read_atm x = do
 accept_tree :: ATM -> ConfigNode -> String
 accept_tree atm config_node = show_depth 0 config_node
     where show_depth :: Int -> ConfigNode -> [Char]
-          show_depth depth configNode = ((replicate (pred depth) '|') ++ '-':(show node_state_type) ++ ':':(show (get_config_type atm configNode))
+          show_depth depth configNode = ((replicate depth '|') ++ '-':(show node_state_type) ++ ':':(show (get_config_type atm configNode))
                                                            ++ '\n':(concat $ map (show_depth (succ depth)) (children configNode)))
             where Just node_state_type = M.lookup (config_state $ configuration configNode) (g atm)
 
@@ -190,6 +190,17 @@ try_to_decide = decide_step 1
           where config_type = get_config_type atm confignode
 
 
+--Convenience method, loads an ATM and then creates the ConfigNode root for it with a tape that looks like the second string
+-- I.E. (atm,root) <- atm_and_root "sexy_atm.txt" "101010"
+atm_and_root :: String -> String -> IO (ATM,ConfigNode)
+atm_and_root atm_str cnfg_str = do
+  atm <- read_atm atm_str
+  let config_node = start_config_input atm (string_tape cnfg_str)
+  return (atm,config_node)
+
+--Convenience method, just does "try_to_decide", but then puts out the output instead of returning the String
+put_decide :: ATM -> ConfigNode -> IO ()
+put_decide x y = putStrLn $ try_to_decide x y
 
 main :: IO String
 main = {-let transition = Transition "q1" (Symbol '0') L
